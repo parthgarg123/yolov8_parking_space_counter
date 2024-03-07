@@ -9,15 +9,15 @@ points =[]
 polyLines=[]
 def draw(event,x,y,flags,param):
     global drawing,points
+    drawing = True
     if event == cv2.EVENT_LBUTTONDOWN:
-        drawing = True
-        points = [(x,y)]
-    elif event == cv2.EVENT_MOUSEMOVE:
-        if drawing:
-            points.append((x,y))
+        points.append((x,y))
+
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
-        polyLines.append(np.array(points,np.int32))
+        if(len(points)==4):
+            polyLines.append(np.array(points,np.int32))
+            points.clear()
 
 while True:
     ret, frame = cap.read()
@@ -27,6 +27,8 @@ while True:
     frame=cv2.resize(frame,(1020,500))
     for i in polyLines:
         cv2.polylines(frame,[i],True,(0,0,255),2)
+    for i in points:
+        cv2.circle(frame,i,3, (0, 255, 0), -1)
     cv2.imshow('FRAME', frame)
     cv2.setMouseCallback('FRAME',draw)
     if cv2.waitKey(25) & 0xFF == ord('q'):
